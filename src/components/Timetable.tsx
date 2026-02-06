@@ -23,6 +23,8 @@ export default function Timetable({ userId }: TimetableProps) {
   const [minAttendance, setMinAttendance] = useState(75)
   const [selectedSlots, setSelectedSlots] = useState<string[]>([])
   const [editingSlot, setEditingSlot] = useState<{ day: string; slots: number[] } | null>(null)
+  const [subjectInput, setSubjectInput] = useState('')
+  const [typeInput, setTypeInput] = useState('class')
   const [loading, setLoading] = useState(true)
 
   const days = workingDays === 5
@@ -111,6 +113,8 @@ export default function Timetable({ userId }: TimetableProps) {
     const day = selectedSlots[0].split('_')[0]
     const slotNumbers = selectedSlots.map(s => parseInt(s.split('_')[1])).sort((a, b) => a - b)
 
+    setSubjectInput('')
+    setTypeInput('class')
     setEditingSlot({ day, slots: slotNumbers })
   }
 
@@ -326,9 +330,11 @@ export default function Timetable({ userId }: TimetableProps) {
                 </label>
                 <input
                   type="text"
-                  id="subjectInput"
+                  value={subjectInput}
+                  onChange={(e) => setSubjectInput(e.target.value)}
                   placeholder="e.g., Mathematics, Lunch, Free Period"
                   className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-dark-100 focus:outline-none focus:border-primary-500"
+                  autoFocus
                 />
               </div>
 
@@ -337,7 +343,8 @@ export default function Timetable({ userId }: TimetableProps) {
                   Type
                 </label>
                 <select
-                  id="typeInput"
+                  value={typeInput}
+                  onChange={(e) => setTypeInput(e.target.value)}
                   className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl text-dark-100 focus:outline-none focus:border-primary-500"
                 >
                   <option value="class">Class</option>
@@ -348,13 +355,12 @@ export default function Timetable({ userId }: TimetableProps) {
 
               <button
                 onClick={() => {
-                  const subject = (document.getElementById('subjectInput') as HTMLInputElement).value
-                  const type = (document.getElementById('typeInput') as HTMLSelectElement).value
-                  if (subject.trim()) {
-                    saveSlot(subject, type)
+                  if (subjectInput.trim()) {
+                    saveSlot(subjectInput, typeInput)
                   }
                 }}
-                className="w-full px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-all duration-300"
+                disabled={!subjectInput.trim()}
+                className="w-full px-6 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-dark-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-300"
               >
                 Save Slot
               </button>
